@@ -1,12 +1,19 @@
-﻿
-using System.Text.Json.Serialization;
+﻿Console.WriteLine("VÍTEJ VE HŘE HANGMAN\n");
 
-void ulozUzivatele(string username)
+Console.WriteLine("Zadej svou přezdívku");
+Console.Write("->");
+
+string uname = Console.ReadLine();
+
+if (uname.Length > 0)
 {
-    string json = File.ReadAllText("statistika.json");
-    //dynamic jsonFile = JsonConverter.DeserializeObject(json);
-}
+    Console.WriteLine("\nVítej " + uname + "\n");
 
+}
+else
+{
+    Console.WriteLine("Jméno není validní, nebudou se ukládat statistiky tvé hry");
+}
 
 void hangman(int wrong)
 {
@@ -85,13 +92,38 @@ void menu()
 }
 
 
+bool writeToLeaderboard(string jmeno, int pocet, int pokuss)
+{
+    string FileName = "../../../leaderboard.csv";
+    string personDetail = jmeno + "," + pocet + "," + pokuss + Environment.NewLine;
+
+    if (!File.Exists(FileName)){
+        string clientHeader = Environment.NewLine;
+
+        File.WriteAllText(FileName, clientHeader);
+    }
+
+    File.AppendAllText(FileName, personDetail);
+
+    return true;
+}
+
+
+void DisplayLeaderboard()
+{
+    string[] leaderboard = System.IO.File.ReadAllLines(@"../../../leaderboard.csv");
+    foreach(string line in leaderboard)
+    {
+        Console.WriteLine(line);
+    }
+}
+
+
 void hra(string randomWord, int pokusy)
 {
     Random rnd = new Random();
 
     bool gg = true;
-
-
     
 
     List<char> pouzitaPismena = new List<char>();
@@ -127,7 +159,7 @@ void hra(string randomWord, int pokusy)
         Console.WriteLine("\nHadej pismenko");
         Console.Write("->");
         char guess = Console.ReadLine()[0];
-
+        
         if (abc.Contains(guess))
         {
 
@@ -172,18 +204,28 @@ void hra(string randomWord, int pokusy)
 
                 }
             }
-        }
-            
-        /*
-        if (CharsRight == randomWord.Length)
+        } else
         {
-            vyhraneHry++;
-            Console.WriteLine("\nMáš " + vyhraneHry + " bod/ů");
-            gg = true;
+
+            Console.WriteLine("Input není validní!!!");
+            hangman(pokusy);
+            CharsRight = printWord(pouzitaPismena, randomWord);
+            Console.Write("\r\n");
+
+            printLines(randomWord);
+
+
         }
-        */
+
+
     }
-    Console.WriteLine("");
+    if (uname.Length > 0)
+    {   
+        
+        vyhraneHry++;
+        writeToLeaderboard(uname, vyhraneHry, pokusy);
+        Console.WriteLine("");
+    }
     
 }
 
@@ -224,8 +266,9 @@ void printLines(String randomWord)
 string connE()
 {
     Random rnd = new Random();
-
-    string[] wordsE = System.IO.File.ReadAllLines("C:\\Users\\zizkade20\\source\\repos\\hangman\\hangman\\TextFile1.txt");
+    
+    string[] wordsE = System.IO.File.ReadAllLines(@"../../../TextFile1.txt");
+    
     int startE = rnd.Next(0, wordsE.Length);
     string randomWordE = wordsE[startE];
 
@@ -237,7 +280,7 @@ string connH()
 {
     Random rnd = new Random();
 
-    string[] wordsH = System.IO.File.ReadAllLines("C:\\Users\\zizkade20\\source\\repos\\hangman\\hangman\\TextFile2.txt");
+    string[] wordsH = System.IO.File.ReadAllLines(@"../../../TextFile2.txt");
     int startH = rnd.Next(0, wordsH.Length);
     string randomWordH = wordsH[startH];
 
@@ -246,19 +289,6 @@ string connH()
 
 
 Random rnd = new Random();
-
-Console.WriteLine("VÍTEJ VE HŘE HANGMAN\n");
-
-Console.WriteLine("Zadej svou přezdívku");
-Console.Write("->");
-
-string uname = Console.ReadLine();
-
-if (uname.Length > 0)
-{
-    Console.WriteLine("\nVítej " + uname + "\n");
-}
-
 
 bool gg = true;
 int pokusy = 6;
@@ -275,8 +305,6 @@ abc.AddRange(abdceda);
 int CharsRight = 0;
 
 
-
-//StreamWriter statistic = new StreamWriter("statistika.txt");
 do
 {
     menu();
@@ -315,17 +343,14 @@ do
                     break;
             }
 
-
-
             Console.WriteLine("\nKONEC HRY\n");
-            
-            //CharsRight = 0;
-            pouzitaPismena.Clear();
             break;
 
 
         case "z":
-            Console.WriteLine("\nBorci s nejvyšším skóre:\n\n\n");
+            Console.WriteLine("\nStatistiky hráčů:\nFormát:\nJméno/počet vyhraných her bez smrti/zbylé životy");
+            DisplayLeaderboard();
+            Console.WriteLine();
             break;
         case "p":
             Console.WriteLine("" +
