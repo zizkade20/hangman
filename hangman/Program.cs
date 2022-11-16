@@ -207,11 +207,10 @@ void hra(string randomWord, int pokusy)
         } else
         {
 
-            Console.WriteLine("Input není validní!!!");
+            Console.WriteLine("Input není validní");
             hangman(pokusy);
             CharsRight = printWord(pouzitaPismena, randomWord);
             Console.Write("\r\n");
-
             printLines(randomWord);
 
 
